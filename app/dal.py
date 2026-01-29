@@ -134,18 +134,20 @@ def get_customers_payments_by_lastname_pattern(pattern: str = "son"):
     conn = get_db_connection()
     cursor = conn.cursor()
     sql_query = """
-    SELECT 
-    customers.customerName,
-    customers.contactFirstName,
-    customers.contactLastName,
-    SUM(payments.amount) 
-    FROM customers
-    INNER JOIN payments
-    ON customers.customerNumber = payments.customerNumber
-    WHERE customers.contactFirstName LIKE '%Mu%' 
-    OR customers.contactFirstName LIKE '%ly%'
-    GROUP BY customers.customerName
-    ORDER BY SUM(payments.amount) DESC
+    select 
+        customers.customerName, 
+        concat(employees.firstName, employees.lastName) as 'full name',
+        sum(payments.amount) as 'total amount'
+    from employees 
+    inner join customers on customers.salesRepEmployeeNumber = employees.reportsTo
+    inner join payments on payments.customerNumber = customers.customerNumber 
+    where 
+        customers.contactFirstName like '%ly%' 
+        or customers.contactFirstName like '%Mu%'
+    group by 
+        customers.customerName, 
+        concat(employees.firstName, employees.lastName) 
+    order by sum(payments.amount) desc
     """
     cursor.execute(sql_query)
     result = cursor.fetchall()
