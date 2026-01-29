@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: api
-        image: davidlevko2025/tst-api
+        image: davidlevko2025/api-week_9:v1
         ports:
         - containerPort: 8000
         env:
@@ -25,4 +25,4 @@ spec:
           - name: DB_USER
             value: root
           - name: DB_PASSWORD
-            value: #####################################
+            value: 12345678
