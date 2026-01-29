@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-deployment
+  labels:
+    app: api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: api
+  template:
+    metadata:
+      labels:
+        app: api
+    spec:
+      containers:
+      - name: api
+        image: davidlevko2025/api-week_9:v1
+        ports:
+        - containerPort: 8000
+        env:
+          - name: DB_HOST
+            value: "sql-service"
+          - name: DB_USER
+            value: "root"
+          - name: DB_PASSWORD
+            value: "12345678"

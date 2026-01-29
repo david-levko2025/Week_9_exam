@@ -1,33 +1,156 @@
 from typing import List, Dict, Any
+from db import get_db_connection
+
 
 def get_customers_by_credit_limit_range():
-    """Return customers with credit limits outside the normal range."""
-    pass
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    sql_query = """
+    SELECT 
+    customerName,
+    creditLimit
+    FROM customers
+    WHERE creditLimit < 10000
+    OR creditLimit > 100000
+        """
+    cursor.execute(sql_query)
+    result = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return result
 
 def get_orders_with_null_comments():
-    """Return orders that have null comments."""
-    pass
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    sql_query = """
+    SELECT 
+    orderNumber,
+    comments
+    FROM orders
+    WHERE comments IS NOT NULL
+    ORDER BY requiredDate
+        """
+    cursor.execute(sql_query)
+    result = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return result
 
 def get_first_5_customers():
-    """Return the first 5 customers."""
-    pass
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    sql_query = """
+    SELECT 
+    customerName,
+    contactFirstName,
+    contactLastName
+    FROM customers
+    ORDER BY contactLastName
+    LIMIT 5
+    """
+    cursor.execute(sql_query)
+    result = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return result
 
 def get_payments_total_and_average():
-    """Return total and average payment amounts."""
-    pass
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    sql_query = """
+    SELECT
+    SUM(amount) AS sumOfPayments,
+    AVG(amount) AS avgOfPayments,
+    MIN(amount) AS minOfPayments,
+    MAX(amount) AS maxOfPayments
+    FROM payments
+    """
+    cursor.execute(sql_query)
+    result = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return result
 
 def get_employees_with_office_phone():
-    """Return employees with their office phone numbers."""
-    pass
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    sql_query = """
+    SELECT 
+    employees.firstName,
+    employees.lastName,
+    offices.phone
+    FROM employees
+    INNER JOIN offices
+    ON offices.officeCode = employees.officeCode
+    """
+    cursor.execute(sql_query)
+    result = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return result
 
 def get_customers_with_shipping_dates():
-    """Return customers with their order shipping dates."""
-    pass
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    sql_query = """
+    SELECT 
+    customers.customerName,
+    orders.shippedDate
+    FROM customers
+    INNER JOIN orders
+    ON orders.customerNumber = customers.customerNumber
+    """
+    cursor.execute(sql_query)
+    result = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return result
 
 def get_customer_quantity_per_order():
-    """Return customer name and quantity for each order."""
-    pass
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    sql_query = """
+    SELECT 
+    customers.customerName,
+    orderdetails.quantityOrdered
+    FROM customers
+    INNER JOIN orders
+    ON customers.customerNumber = orders.customerNumber
+    INNER JOIN orderdetails
+    ON orderdetails.orderNumber = orders.orderNumber
+    ORDER BY customerName
+    """
+    cursor.execute(sql_query)
+    result = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return result
 
 def get_customers_payments_by_lastname_pattern(pattern: str = "son"):
-    """Return customers and payments for last names matching pattern."""
-    pass
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    sql_query = """
+    select 
+        customers.customerName, 
+        concat(employees.firstName, employees.lastName) as 'full name',
+        sum(payments.amount) as 'total amount'
+    from employees 
+    inner join customers on customers.salesRepEmployeeNumber = employees.reportsTo
+    inner join payments on payments.customerNumber = customers.customerNumber 
+    where 
+        customers.contactFirstName like '%ly%' 
+        or customers.contactFirstName like '%Mu%'
+    group by 
+        customers.customerName, 
+        concat(employees.firstName, employees.lastName) 
+    order by sum(payments.amount) desc
+    """
+    cursor.execute(sql_query)
+    result = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return result
