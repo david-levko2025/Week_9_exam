@@ -8,6 +8,8 @@ from dal import get_employees_with_office_phone
 from dal import get_customers_with_shipping_dates
 from dal import get_customer_quantity_per_order
 from dal import get_customers_payments_by_lastname_pattern
+import uvicorn
+
 app = FastAPI()
 
 init_database()
@@ -63,3 +65,6 @@ def customers_payments_by_lastname_pattern(pattern: str = "son"):
     result = get_customers_payments_by_lastname_pattern()
     return {"messeage": "successfully",
             "result":result}
+
+if __name__ == "__main__":
+    uvicorn.run("main:app",port=8000,host="localhost" ,reload=True)
